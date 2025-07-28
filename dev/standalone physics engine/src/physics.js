@@ -5,7 +5,6 @@ import { Mainfold } from "./mainfold.js";
 export class PhysWorld
 {
     
-
     constructor(bodies = [], gravity = {x:0, y:0})
     {
         this.bodies = bodies;
@@ -30,7 +29,7 @@ export class PhysWorld
         {
             for (let body of this.bodies) 
             {
-                body.updateBody(dt, this.gravity);   
+                body.updateBody(dt, this.gravity, iterations);   
             }
 
             const n = this.bodies.length;

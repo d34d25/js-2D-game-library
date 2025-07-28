@@ -198,9 +198,11 @@ export class Rigidbody
     }
 
     
-    updateBody(time, gravity = {x:0, y: 9.8})
+    updateBody(time, gravity = {x:0, y: 9.8}, iterations)
     {
         if(this.isStatic) return;
+
+        time /= iterations;
 
         //Rigidbody.updatedBodiesCount++;
 

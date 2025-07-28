@@ -61,7 +61,7 @@ let theFloor = createBodyBox({position: {x: 720/2, y: 640}, size: {w: 720, h:40}
 
 const FIXED_TIMESTEP = 1 / 60;
 
-const phys = new PhysWorld([box,triangle, floor, box2 ,floor2, floor3, theFloor], {x:0, y:9.8});
+const phys = new PhysWorld([box,triangle, floor, box2 ,floor2, floor3, theFloor], {x:0, y:9.8 * 20});
 
 let testPlayer = new TestPlayer(createBodyBox({position: {x: 0, y: 0}, size: {w: 35, h:35}, density: 1, restitution: 0.6, affectedByGravity: false, linearDamping:{x: 0.5,y:0.5}, angularDamping: 0.7}), phys); 
 
@@ -90,7 +90,7 @@ function gameLoop(timestamp) {
     while (accumulator >= FIXED_TIMESTEP) {
         testPlayer.move(dt, keysPressed, mousePos, mouseClicked);
 
-        phys.step({dt: FIXED_TIMESTEP, useRotations: true, iterations: 5});
+        phys.step({dt: FIXED_TIMESTEP, useRotations: false, iterations: 20}); //-------------------------------------------------------------------------
 
         accumulator -= FIXED_TIMESTEP;
     }
