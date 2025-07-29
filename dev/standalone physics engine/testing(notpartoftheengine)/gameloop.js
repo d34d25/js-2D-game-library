@@ -90,7 +90,7 @@ function gameLoop(timestamp) {
     while (accumulator >= FIXED_TIMESTEP) {
         testPlayer.move(dt, keysPressed, mousePos, mouseClicked);
 
-        phys.step({dt: FIXED_TIMESTEP, useRotations: false, iterations: 20}); //-------------------------------------------------------------------------
+        phys.step({dt: FIXED_TIMESTEP, useRotations: true, iterations: 20}); //-------------------------------------------------------------------------
 
         accumulator -= FIXED_TIMESTEP;
     }

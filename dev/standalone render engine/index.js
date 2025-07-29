@@ -1,4 +1,5 @@
 import { drawCircle, drawPolygon, drawCircleOutline, drawPolygonOutline, drawRectangle, drawGradientCircle, drawGradientTriangle, drawTriangle } from "./src/basicDrawing.js";
+import { Camera } from "./src/camera.js";
 import { drawFPS } from "./src/debugDrawing.js";
 import { cropImage, loadImageLazy, playAnimation } from "./src/imageDrawing.js";
 import { CircularLigth, ConeLight, setDarkOverlayUnified} from "./src/light.js";
@@ -18,6 +19,7 @@ const lights = [
   new ConeLight({position: { x: 700, y: 150 },angle: Math.PI/2 * 1.5,spread: 8,length: 200,intensity: 0.8})
 ];
 
+const camera = new Camera({position: {x: 0, y: 0}, scale:1, rotation: 2});
 
 var testImage = loadImageLazy("assets/Sprite-0001.png");
 var sprites = [];
@@ -47,10 +49,25 @@ function startGameLoop() {
 
     elapsed += deltaTime;
 
+    camera.rotation += 0.01;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    camera.drawWithCamera({ctx, canvas, drawScene: () => draw(elapsed)});
+    
+    requestAnimationFrame(loop);
+  }
 
-    drawPolygonOutline({ctx: ctx, vertices: boxVertices});
+  requestAnimationFrame(loop);
+}
+
+startGameLoop();
+
+
+function draw(elapsed)
+{
+
+  drawPolygonOutline({ctx: ctx, vertices: boxVertices});
 
     drawCircle({ctx: ctx, point: {x:200,y:200}, color: 'red', radius: 20, rotationIndicator: true});
     
@@ -66,24 +83,17 @@ function startGameLoop() {
       elapsedTime: elapsed
     });
 
-  
     angle += 0.01;
     drawRectangle({ctx,x: 100, y:100, color: 'green', rotation: angle, width: 300, height:100, alpha: 0.5});
     
     if (currentSprite) {
       currentSprite.draw({ctx,dx: 100,dy: 200,scaleX: 10,scaleY: 10,rotationRadians: angle,alpha: 1});
-
     }
 
-    setDarkOverlayUnified({ctx,width: canvas.width,height: canvas.height,lights: lights,hasColor: true});
+    setDarkOverlayUnified({ctx, width: canvas.width * 2,height: canvas.height * 2,lights: lights,hasColor: true});
 
     drawGradientCircle({ctx,x: 500, y:500,radius:60});
     drawGradientTriangle({ctx,x: 500, y:500,width:60, height:70});
     drawTriangle({ctx,x: 100, y:500,width:60, height:70});
-    requestAnimationFrame(loop);
-  }
 
-  requestAnimationFrame(loop);
 }
-
-startGameLoop();
