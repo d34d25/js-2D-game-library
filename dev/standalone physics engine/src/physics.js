@@ -21,7 +21,7 @@ export class PhysWorld
         this.jList = [];
     }
 
-    step({dt, useRotations = false, iterations = 10}) 
+    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = -0.75}) 
     {
         //Rigidbody.updatedBodiesCount = 0;
 
@@ -41,18 +41,18 @@ export class PhysWorld
                     const bodyA = this.bodies[i];
                     const bodyB = this.bodies[j];
 
-                    if(!AABBvsAABB(bodyA, bodyB)) continue;
-
                     if(bodyA.isStatic && bodyB.isStatic) continue;
 
-                    this.collisionStep(bodyA,bodyB, useRotations);
+                    if(!AABBvsAABB(bodyA, bodyB)) continue;
+
+                    this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance);
                 }
             }
         }
         
     }
 
-    collisionStep(bodyA, bodyB, useRotations)
+    collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance)
     {   
         let result = this.resolveCollisions(bodyA, bodyB);
 
@@ -73,14 +73,30 @@ export class PhysWorld
                 contacts.contactCount
             );
 
-            if(useRotations)
+            if(useFriction)
             {
-                this.resolveCollisionsRotationalAndFriction(manifold);
+                if(useRotations)
+                {
+                    this.resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance);
+                }
+                else
+                {
+                    this.resolveCollisionsBasicWithFriction(manifold, directionalFriction, angleTolerance);   
+                }
+
             }
             else
             {
-                this.resolveCollisionsBasicWithFriction(manifold);   
+                if(useRotations)
+                {
+                    this.resolveCollisionsRotational(manifold);
+                }
+                else
+                {
+                    this.resolveCollisionsBasic(manifold);   
+                }
             }
+            
             
         }
     }
@@ -401,7 +417,7 @@ export class PhysWorld
         }
     }
 
-    resolveCollisionsRotationalAndFriction(manifold)
+    resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance)
     {
         const bodyA = manifold.bodyA;
         const bodyB = manifold.bodyB;
@@ -627,7 +643,7 @@ export class PhysWorld
             let ra = this.raList[i];
             let rb = this.rbList[i];
 
-            if(this.shouldApplyFriction(normal)) continue;
+            if(this.shouldApplyFriction(normal, directionalFriction, angleTolerance)) continue;
 
             if(!bodyA.isStatic)
             {
@@ -657,8 +673,10 @@ export class PhysWorld
     }
 
 
-    shouldApplyFriction(normal) 
+    shouldApplyFriction(normal, directionalFriction, angleTolerance) 
     {
+        if(!directionalFriction) return false;
+
         if(this.gravity.x !== 0 || this.gravity.y !== 0)
         {
             const gravityNorm = normalize(this.gravity);
@@ -672,14 +690,11 @@ export class PhysWorld
             const dot = dotProduct(normalNorm, gravityNorm);
 
             // Skip friction if dot > -0.75 means normal is more horizontal or upward wall
-            return dot > -0.75;
+            return dot > angleTolerance; //-0.75;
         }
 
         return false; // No gravity means no friction skip
     }
-
-
-
 
 }
 

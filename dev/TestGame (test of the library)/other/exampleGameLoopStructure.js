@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 const FIXED_TIMESTEP = 1 / 60;
 let lastTime = 0;
 let accumulator = 0;
+let elapsed = 0;
 
 function update()
 {
@@ -23,6 +24,7 @@ function gameLoop(timestamp)
     const frameTime = Math.min(dt, 0.25);
     lastTime = timestamp;
     accumulator += frameTime;
+    elapsed += dt;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     

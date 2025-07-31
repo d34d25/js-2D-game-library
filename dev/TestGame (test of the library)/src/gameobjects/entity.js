@@ -111,4 +111,21 @@ export class Entity
             this.currentSprite.draw({ctx, dx: this.position.x, dy: this.position.y, scaleX, scaleY, alpha, flipHorizontally: flipX, flipVertically: flipY});
         }
     }
+    
+}
+
+export function howToCenterTheCamera()
+{
+    return "(position + size /2) - canvas size / 2 / camera scale";
+}
+
+export function centerCameraOnEntity(camera, entity, canvas) 
+{
+    const centerX = entity.position.x + entity.size.w / 2;
+    const centerY = (entity.position.y - 120) + entity.size.h / 2;
+
+    camera.position = {
+        x: centerX - canvas.width / 2 / camera.scale,
+        y: centerY - canvas.height / 2 / camera.scale
+    };
 }
