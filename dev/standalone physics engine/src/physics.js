@@ -21,7 +21,7 @@ export class PhysWorld
         this.jList = [];
     }
 
-    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = -0.75}) 
+    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = 0.75}) 
     {
         //Rigidbody.updatedBodiesCount = 0;
 
@@ -672,7 +672,6 @@ export class PhysWorld
 
     }
 
-
     shouldApplyFriction(normal, directionalFriction, angleTolerance) 
     {
         if(!directionalFriction) return false;
@@ -682,15 +681,11 @@ export class PhysWorld
             const gravityNorm = normalize(this.gravity);
             let normalNorm = normalize(normal);
 
-            // Flip normal if it points in same direction as gravity
-            if(dotProduct(normalNorm, gravityNorm) > 0) {
-                normalNorm = scaleVector(normalNorm, -1);
-            }
-
             const dot = dotProduct(normalNorm, gravityNorm);
 
-            // Skip friction if dot > -0.75 means normal is more horizontal or upward wall
-            return dot > angleTolerance; //-0.75;
+            if(dot > angleTolerance) return false;
+
+            return dot < angleTolerance; //0.75;
         }
 
         return false; // No gravity means no friction skip
@@ -780,3 +775,31 @@ function logContactPoints(ctx, contacts)
     }
     
  */
+
+    /**
+     * 
+     * 
+     *  shouldApplyFriction(normal, directionalFriction, angleTolerance) 
+        {
+            if(!directionalFriction) return false;
+
+            if(this.gravity.x !== 0 || this.gravity.y !== 0)
+            {
+                const gravityNorm = normalize(this.gravity);
+                let normalNorm = normalize(normal);
+
+                // Flip normal if it points in same direction as gravity
+                if(dotProduct(normalNorm, gravityNorm) > 0) {
+                    normalNorm = scaleVector(normalNorm, -1);
+                }
+
+                const dot = dotProduct(normalNorm, gravityNorm);
+
+                // Skip friction if dot > -0.75 means normal is more horizontal or upward wall
+                return dot > angleTolerance; //-0.75;
+            }
+
+            return false; // No gravity means no friction skip
+        }
+     * 
+     */

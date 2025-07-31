@@ -20,18 +20,29 @@ export class Player
 
         const INPUT = this.input;
 
-        if(INPUT.isKeyDown('KeyA')) this.entity.body.addForce({x:-speed, y:0});
-        else if(INPUT.isKeyDown('KeyD')) this.entity.body.addForce({x:speed, y:0});
+        let speedX = 0, speedY = 0;
 
+        if(INPUT.isKeyDown('KeyA')) speedX = -speed;
+        else if(INPUT.isKeyDown('KeyD')) speedX = speed;
 
-        if(INPUT.isKeyPressed('Space')) this.entity.body.addForce({x:0, y: -jump});
+        if(INPUT.isKeyDown('KeyW')) speedY = -speed;
+        else if(INPUT.isKeyDown('KeyS')) speedY = speed;
+
+        //if(INPUT.isKeyPressed('Space')) this.entity.body.addForce({x:0, y: -jump});
+
+        this.entity.body.addForce({x:speedX,y:speedY});
 
         let vx = this.entity.body.linearVelocity.x;
+        let vy = this.entity.body.linearVelocity.y;
 
         if (vx > MAX_SPEED) vx = MAX_SPEED;
         if (vx < -MAX_SPEED) vx = -MAX_SPEED;
 
+        if (vy > MAX_SPEED) vy = MAX_SPEED;
+        if (vy < -MAX_SPEED) vy = -MAX_SPEED;
+
         this.entity.body.linearVelocity.x = vx;
+        this.entity.body.linearVelocity.y = vy;
 
         INPUT.update();
     }

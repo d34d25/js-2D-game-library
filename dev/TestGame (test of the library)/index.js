@@ -17,14 +17,15 @@ const obstacleB = physics.createBodyBox({position: {x:160, y: 535}, size: {w:50,
 const obstacleC = physics.createBodyBox({position: {x:360, y: 535}, size: {w:150,h:20}, isStatic: true, noRotation:true,dynamicFriction: 0.4, staticFriction:0.6});
 obstacleC.setAngle(0.2);
 
-const testEntity = new Entity({position: {x:560, y: 30}, size: {w: 30, h: 30}});
+
 const testEntityB = new Entity({position: {x:160, y: 30}, size: {w: 30, h: 30}});
 testEntityB.createBox({density:1, hasRotations: false, bounciness: 0, dynamicFriction: 0.4, staticFriction:0.6});
 
 const testEntityC = new Entity({position: {x:360, y: 30}, size: {w: 30, h: 30}});
 testEntityC.createBox({density:1, hasRotations: true, bounciness: 0, dynamicFriction: 0.4, staticFriction:0.6});
 
-testEntity.createBox({density:1, hasRotations: false, bounciness: 0, dynamicFriction: 0.8, staticFriction:1});
+const testEntity = new Entity({position: {x:560, y: 400}, size: {w: 30, h: 30}});
+testEntity.createBox({density:1, hasRotations: false, bounciness: 0, dynamicFriction: 0.8, staticFriction:1, hasGravity: false});
 testEntity.addCircularLight({position: testEntity.position, radius: 350, intensity: 1, color: {r:255, b: 0, g:70}});
 
 const testPlayer = new Player(testEntity, canvas);
