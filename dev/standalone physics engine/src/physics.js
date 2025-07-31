@@ -547,8 +547,10 @@ export class PhysWorld
         }
 
         //friction
+
         for(let i = 0; i < contactCount; i++)
         {
+
             let ra = {x: 0, y: 0};
             let rb = {x: 0, y: 0};
 
@@ -625,6 +627,7 @@ export class PhysWorld
             let ra = this.raList[i];
             let rb = this.rbList[i];
 
+            if(this.shouldApplyFriction(normal)) continue;
 
             if(!bodyA.isStatic)
             {
@@ -653,7 +656,31 @@ export class PhysWorld
 
     }
 
-    
+
+    shouldApplyFriction(normal) 
+    {
+        if(this.gravity.x !== 0 || this.gravity.y !== 0)
+        {
+            const gravityNorm = normalize(this.gravity);
+            let normalNorm = normalize(normal);
+
+            // Flip normal if it points in same direction as gravity
+            if(dotProduct(normalNorm, gravityNorm) > 0) {
+                normalNorm = scaleVector(normalNorm, -1);
+            }
+
+            const dot = dotProduct(normalNorm, gravityNorm);
+
+            // Skip friction if dot > -0.75 means normal is more horizontal or upward wall
+            return dot > -0.75;
+        }
+
+        return false; // No gravity means no friction skip
+    }
+
+
+
+
 }
 
 function drawCircle(ctx, point, color = 'red', radius = 15, rotation) 
@@ -721,4 +748,20 @@ function logContactPoints(ctx, contacts)
         drawCircle(ctx, contacts.contact2, 'yellow', 10, 0);
         drawNormal(contacts.contact2, contacts.normal, 'black');
     }
+
+
+    
+
 }
+
+
+
+
+/**
+ *  shouldApplyFriction(normal) 
+    {
+        const dot = dotProduct(normal, normalize(this.gravity));
+        return dot > -0.75; // returns true when surface is a wall or ceiling
+    }
+    
+ */

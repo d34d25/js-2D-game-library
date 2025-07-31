@@ -41,13 +41,13 @@ const ctx = canvas.getContext('2d');
 let box = createBodyBox({position: {x: 210, y: 400}, size: {w: 35, h:35}, density: 1, restitution: 0.6,affectedByGravity: true});
 box.angle = 0;
 
-let box2 = createBodyTriangle({position: {x: 210, y: 550}, size: {w: 70, h:30}, density: 1, restitution: 0.6 ,isStatic: true, noRotation: true});
+let box2 = createBodyTriangle({position: {x: 700, y: 550}, size: {w: 70, h:30}, density: 1, restitution: 0.6 ,isStatic: true, noRotation: true});
 box2.angle = 0;
 
-let triangle = createBodyBox({position: {x: 500, y: 240}, size: {w: 35, h:35}, density: 1, restitution: 0.6, staticFriction:0.2, dynamicFriction:0.1});
+let triangle = createBodyBox({position: {x: 500, y: 240}, size: {w: 35, h:35}, density: 1, restitution: 0.6, staticFriction:0.6, dynamicFriction:0.4});
 triangle.setAngle(0.1);
 
-let floor = createBodyBox({position: {x: 210, y: 600}, size: {w: 1, h:35}, density: 1, restitution: 0, isStatic:true, noRotation: true});
+let floor = createBodyBox({position: {x: 210, y: 600}, size: {w: 1, h:400}, density: 1, restitution: 0, isStatic:true, noRotation: true});
 floor.angle = 0;
 
 let floor2 = createBodyBox({position: {x: 400, y: 100}, size: {w: 120, h:40}, density: 1, restitution: 0,isStatic:true, noRotation: true});
@@ -59,11 +59,9 @@ floor3.setAngle(-0.1);
 let theFloor = createBodyBox({position: {x: 720/2, y: 640}, size: {w: 720, h:40}, density: 1, restitution: 0,isStatic:true, noRotation: true, dynamicFriction:0.4, staticFriction:0.6});
 
 
-const FIXED_TIMESTEP = 1 / 60;
+const phys = new PhysWorld([box,triangle, floor, box2 ,floor2, floor3, theFloor], {x:0, y:150});
 
-const phys = new PhysWorld([box,triangle, floor, box2 ,floor2, floor3, theFloor], {x:0, y:9.8 * 20});
-
-let testPlayer = new TestPlayer(createBodyBox({position: {x: 0, y: 0}, size: {w: 35, h:35}, density: 1, restitution: 0.6, affectedByGravity: false, linearDamping:{x: 0.5,y:0.5}, angularDamping: 0.7}), phys); 
+let testPlayer = new TestPlayer(createBodyBox({position: {x: 0, y: 0}, size: {w: 35, h:35}, density: 1, restitution: 0, affectedByGravity: true, linearDamping:{x: 0,y:0}, angularDamping: 0.7, noRotation: true}), phys); 
 
 phys.bodies.push(testPlayer.body);
 
@@ -87,13 +85,11 @@ function gameLoop(timestamp) {
     timeAccumulator += dt;
     frameCounter++;
 
-    while (accumulator >= FIXED_TIMESTEP) {
-        testPlayer.move(dt, keysPressed, mousePos, mouseClicked);
+    testPlayer.move(dt, keysPressed, mousePos, mouseClicked);
 
-        phys.step({dt: FIXED_TIMESTEP, useRotations: true, iterations: 20}); //-------------------------------------------------------------------------
+    phys.step({dt: dt, useRotations: true, iterations: 20}); //-------------------------------------------------------------------------
 
-        accumulator -= FIXED_TIMESTEP;
-    }
+
 
     const physicsEnd = performance.now(); // ⏱️ End physics timer
     const physicsDuration = physicsEnd - physicsStart;

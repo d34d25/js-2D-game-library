@@ -9,5 +9,6 @@ export class Mainfold
         this.contact1 = contact1;
         this.contact2 = contact2;
         this.contactCount = contactCount;
+        
     }
 }

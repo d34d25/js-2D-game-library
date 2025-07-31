@@ -7,8 +7,8 @@ export class TestPlayer {
   }
 
   move(timeStep, keysPressed, mousePos, mouseClicked) {
-    const speed = 30;
-    const rotSpeed = 30;
+    const speed = 200 * 10;
+    const rotSpeed = 20;
 
     let speedX = 0, speedY = 0, rotation = 0;
 
