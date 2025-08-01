@@ -1,0 +1,8 @@
+Stacking issue: when many dynamic bodies (around 40 to 45) are stacked on top of a static body, the start to sink a bit, increasing
+iterations improves this issue, this happens due to how bodies are separated, increasing the iterations makes bodies to move in 
+smaller steps giving more time to the physics engine to properly separate the bodies.
+
+Friction sudden slowdown: when an objects moves upwards on titled surface it experiences more friction than going downwards.
+
+Friction and gravity side effect: increasing gravity makes bodies to experience more friction while decreasing gravity makes bodies to experience less friction,
+an easy work around for this is to either decrease/increase gravity and decrease/increase friction as needed.
