@@ -36,7 +36,7 @@ const testPlayer = new Player(testEntity, canvas);
 let levelOne = new Levels(
     {
         player: testPlayer,
-        bodies: [testEntityB.body,FLOOR,testPlayer.entity.body, obstacleA, obstacleB, testEntityC.body, obstacleC, testEntityD.body],
+        bodies: [testEntityB.body,FLOOR,testEntityD.body, testEntityC.body,testPlayer.entity.body, obstacleA, obstacleB, obstacleC],
         entities: [],
         gravity: {x:0, y:550}
     }
@@ -52,16 +52,18 @@ levelOne.update = function(dt)
 
 levelOne.render = function(ctx)
 {
-    
     testPlayer.camera.drawWithCamera({ctx, canvas, drawScene: () => renderScene(ctx)});
 }
 
 function renderScene(ctx)
 {
 
+    //testPlayer.entity.body.drawNormals(ctx, 100);
+
     for(let currentBody = 0; currentBody < levelOne.physWorld.bodies.length; currentBody++)
     {
         render.drawPolygon({ctx, vertices: levelOne.physWorld.bodies[currentBody].transformedVertices, fillStyle:'crimson', alpha: 1})
+        levelOne.physWorld.bodies[currentBody].drawNormals(ctx, 100);
     }
 
     levelOne.player.entity.drawRigidbodyFull(ctx, 'blue',1);

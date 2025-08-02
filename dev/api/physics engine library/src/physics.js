@@ -21,9 +21,8 @@ export class PhysWorld
         this.jList = [];
     }
 
-    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = 0.75, log = false}) 
+    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = 0.75}) 
     {
-        //Rigidbody.updatedBodiesCount = 0;
 
         for(let i = 0; i < iterations; i++)
         {
@@ -45,14 +44,14 @@ export class PhysWorld
 
                     if(!AABBvsAABB(bodyA, bodyB)) continue;
 
-                    this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance, log);
+                    this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance);
                 }
             }
         }
         
     }
 
-    collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance, log)
+    collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance)
     {   
         let result = this.resolveCollisions(bodyA, bodyB);
 
@@ -77,11 +76,11 @@ export class PhysWorld
             {
                 if(useRotations)
                 {
-                    this.resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance, log);
+                    this.resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance);
                 }
                 else
                 {
-                    this.resolveCollisionsBasicWithFriction(manifold, directionalFriction, angleTolerance, log);   
+                    this.resolveCollisionsBasicWithFriction(manifold, directionalFriction, angleTolerance);   
                 }
 
             }
@@ -178,9 +177,6 @@ export class PhysWorld
         let j = -(1 + e) * dotProduct(relativeVel, normal);
 
         j /= bodyA.invMass + bodyB.invMass;
-
-        //console.log("Impulse scalar j:", j);
-
 
         if(!bodyA.isStatic)
         {
@@ -345,13 +341,11 @@ export class PhysWorld
             (raPerpDotN * raPerpDotN) * bodyA.invInertia + 
             (rbPerpDotN * rbPerpDotN) * bodyB.invInertia;
 
-            //console.log("contacts", contactCount);
 
             let j;
 
-            if(contactCount === 2 && areContactsAligned(contact1,contact2,normal)) //(contactCount === 2 && areContactsAligned(contact1,contact2,normal))
+            if(contactCount === 2 && areContactsAligned(contact1,contact2,normal))
             {
-                //console.log("called");
 
                 relativeVel = subtractVectors(bodyB.linearVelocity, bodyA.linearVelocity);
 
@@ -361,7 +355,6 @@ export class PhysWorld
 
                 j /= contactCount;
 
-                //console.log("j linear: ", j);
             }
             else
             {
@@ -371,7 +364,6 @@ export class PhysWorld
 
                 j /= contactCount;
 
-                //console.log("j rotational: ", j);
             }
 
             let impulse = {x:0, y:0};
@@ -417,7 +409,7 @@ export class PhysWorld
         }
     }
 
-    resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance, log)
+    resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance)
     {
         const bodyA = manifold.bodyA;
         const bodyB = manifold.bodyB;
@@ -643,7 +635,7 @@ export class PhysWorld
             let ra = this.raList[i];
             let rb = this.rbList[i];
 
-            if(this.shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB,log)) continue;
+            if(this.shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB)) continue;
 
             if(!bodyA.isStatic)
             {
@@ -672,7 +664,7 @@ export class PhysWorld
 
     }
 
-    shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB, log) 
+    shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB) 
     {
         if (!directionalFriction) return false;
 
@@ -688,13 +680,11 @@ export class PhysWorld
                 let normalNorm = { ...normal };
                 
                 const alignment = dotProduct(normalNorm, gravityNorm);
-                //const isSideContact = alignment === 0;
                 const isSideContact = Math.abs(alignment) < angleTolerance;
                 return isSideContact;
             }
             else
             {
-
                 if(bodyA.isStatic)
                 {
                     staticBody = bodyA;
@@ -718,13 +708,7 @@ export class PhysWorld
 
                 const dot = dotProduct(normalNorm, gravityNorm);
 
-                if (log)
-                {
-                    this.frictionNormalLogs(normalNorm,gravityNorm,dot,angleTolerance)
-                }
-
                 return dot < angleTolerance;
-
             }
            
         }
@@ -774,7 +758,6 @@ function logContactPoints(ctx, contacts)
             y: point.y + normal.y * scale
         };
 
-        // Draw the normal as a line
         ctx.beginPath();
         ctx.moveTo(point.x, point.y);
         ctx.lineTo(end.x, end.y);
@@ -782,7 +765,6 @@ function logContactPoints(ctx, contacts)
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Optionally draw arrowhead
         const arrowSize = 5;
         const angle = Math.atan2(end.y - point.y, end.x - point.x);
 
@@ -819,39 +801,3 @@ function logContactPoints(ctx, contacts)
 
 
 
-/**
- *  shouldApplyFriction(normal) 
-    {
-        const dot = dotProduct(normal, normalize(this.gravity));
-        return dot > -0.75; // returns true when surface is a wall or ceiling
-    }
-    
- */
-
-    /**
-     * 
-     * 
-     *  shouldApplyFriction(normal, directionalFriction, angleTolerance) 
-        {
-            if(!directionalFriction) return false;
-
-            if(this.gravity.x !== 0 || this.gravity.y !== 0)
-            {
-                const gravityNorm = normalize(this.gravity);
-                let normalNorm = normalize(normal);
-
-                // Flip normal if it points in same direction as gravity
-                if(dotProduct(normalNorm, gravityNorm) > 0) {
-                    normalNorm = scaleVector(normalNorm, -1);
-                }
-
-                const dot = dotProduct(normalNorm, gravityNorm);
-
-                // Skip friction if dot > -0.75 means normal is more horizontal or upward wall
-                return dot > angleTolerance; //-0.75;
-            }
-
-            return false; // No gravity means no friction skip
-        }
-     * 
-     */

@@ -1,5 +1,5 @@
 import { AABB } from "./aabb.js";
-
+import { subtractVectors, normalize } from "./maths.js";
 export class Rigidbody
 {
     static updatedBodiesCount = 0;
@@ -70,6 +70,11 @@ export class Rigidbody
         return (this.inertia === Infinity || this.inertia=== 0) ? 0 : (1 / this.inertia);
     }
 
+    get hasInfiniteMass()
+    {
+        return this.mass === Infinity;
+    }
+
 
     get transformedVertices()
     {
@@ -86,11 +91,86 @@ export class Rigidbody
         });
     }
 
-
-    get hasInfiniteMass()
+    get normals() 
     {
-        return this.mass === Infinity;
+        const normalList = [];
+
+        let vertices = this.transformedVertices;
+
+        for (let i = 0; i < vertices.length; i++) {
+            let va = vertices[i];
+            let vb = vertices[(i + 1) % vertices.length];
+
+            let edge = subtractVectors(vb, va);
+            let axis = normalize({ x: -edge.y, y: edge.x });
+
+            normalList.push(axis);
+        }
+
+        //0 down, 1 left, 2 up, 3 right
+        return normalList;
     }
+
+    get normalDirection() {
+        return {
+            down: 0,
+            left: 1,
+            up: 2,
+            right: 3,
+        };
+    }
+
+    
+    drawNormals(ctx, scale = 20) 
+    {
+        const vertices = this.transformedVertices;
+        const normals = this.normals;
+
+        const colors = ['red', 'green', 'blue', 'orange'];
+
+        // Access your normalDirection mapping
+        const normalDirection = this.normalDirection; // assuming it's a getter on your class
+
+        for (let i = 0; i < vertices.length; i++) 
+        {
+            const va = vertices[i];
+            const vb = vertices[(i + 1) % vertices.length];
+
+            // Midpoint of edge
+            const midpoint = {
+                x: (va.x + vb.x) / 2,
+                y: (va.y + vb.y) / 2
+            };
+
+            const normal = normals[i];
+
+            // Use a bigger scale only for the "up" normal
+            let scaleFactor = scale;
+            if (i === normalDirection.up) {
+                scaleFactor *= 1.5;  // increase size by 50%
+            }
+
+            const end = {
+                x: midpoint.x + normal.x * scaleFactor,
+                y: midpoint.y + normal.y * scaleFactor
+            };
+
+            const color = colors[i % colors.length];
+
+            // Draw line
+            ctx.beginPath();
+            ctx.moveTo(midpoint.x, midpoint.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = (i === normalDirection.up) ? 4 : 2; // thicker line for up normal
+            ctx.stroke();
+
+            // Draw arrowhead
+            drawArrowhead(ctx, midpoint, end, 10, color);
+        }
+    }
+
+
 
     move(amount)
     {
@@ -395,3 +475,21 @@ export function createBodyCircle({position = {x:0, y:0},radius = 10,density = 1,
 
 
 
+
+function drawArrowhead(ctx, from, to, size = 20, color = 'black') 
+{
+    const angle = Math.atan2(to.y - from.y, to.x - from.x);
+    ctx.beginPath();
+    ctx.moveTo(to.x, to.y);
+    ctx.lineTo(
+        to.x - size * Math.cos(angle - Math.PI / 6),
+        to.y - size * Math.sin(angle - Math.PI / 6)
+    );
+    ctx.lineTo(
+        to.x - size * Math.cos(angle + Math.PI / 6),
+        to.y - size * Math.sin(angle + Math.PI / 6)
+    );
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
