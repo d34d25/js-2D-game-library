@@ -1,5 +1,5 @@
-import * as input from "./lib/simpleInput.js";
-import { Camera } from "./lib/simpleRender.js";
+import * as input from "../../lib/simpleInput.js";
+import { Camera } from "../../lib/simpleRender.js";
 
 export class Player
 {
@@ -11,12 +11,8 @@ export class Player
         this.camera = new Camera({position: this.cameraPos, scale: 0.9, rotation: 0});
     }
 
-    move()
+    move({speed = 200 * 10, jump = 500 * 100, MAX_SPEED = 150} = {})
     {
-        const MAX_SPEED = 150;
-
-        let speed = 200 * 10;
-        let jump = 200 * 100;
 
         const INPUT = this.input;
 
@@ -28,7 +24,8 @@ export class Player
         if(INPUT.isKeyDown('KeyW')) speedY = -speed;
         else if(INPUT.isKeyDown('KeyS')) speedY = speed;
 
-        //if(INPUT.isKeyPressed('Space')) this.entity.body.addForce({x:0, y: -jump});
+        
+        if(INPUT.isKeyPressed('Space')) speedY = -jump;
 
         this.entity.body.addForce({x:speedX,y:speedY});
 
@@ -42,7 +39,7 @@ export class Player
         if (vy < -MAX_SPEED) vy = -MAX_SPEED;
 
         this.entity.body.linearVelocity.x = vx;
-        this.entity.body.linearVelocity.y = vy;
+        //this.entity.body.linearVelocity.y = vy;
 
         INPUT.update();
     }

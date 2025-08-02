@@ -21,7 +21,7 @@ export class PhysWorld
         this.jList = [];
     }
 
-    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = 0.75}) 
+    step({dt, useRotations = false, iterations = 10, useFriction = true, directionalFriction = true, angleTolerance = 0.75, log = false}) 
     {
         //Rigidbody.updatedBodiesCount = 0;
 
@@ -45,14 +45,14 @@ export class PhysWorld
 
                     if(!AABBvsAABB(bodyA, bodyB)) continue;
 
-                    this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance);
+                    this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance, log);
                 }
             }
         }
         
     }
 
-    collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance)
+    collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance, log)
     {   
         let result = this.resolveCollisions(bodyA, bodyB);
 
@@ -77,11 +77,11 @@ export class PhysWorld
             {
                 if(useRotations)
                 {
-                    this.resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance);
+                    this.resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance, log);
                 }
                 else
                 {
-                    this.resolveCollisionsBasicWithFriction(manifold, directionalFriction, angleTolerance);   
+                    this.resolveCollisionsBasicWithFriction(manifold, directionalFriction, angleTolerance, log);   
                 }
 
             }
@@ -417,7 +417,7 @@ export class PhysWorld
         }
     }
 
-    resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance)
+    resolveCollisionsRotationalAndFriction(manifold, directionalFriction, angleTolerance, log)
     {
         const bodyA = manifold.bodyA;
         const bodyB = manifold.bodyB;
@@ -643,7 +643,7 @@ export class PhysWorld
             let ra = this.raList[i];
             let rb = this.rbList[i];
 
-            if(this.shouldApplyFriction(normal, directionalFriction, angleTolerance)) continue;
+            if(this.shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB,log)) continue;
 
             if(!bodyA.isStatic)
             {
@@ -672,23 +672,75 @@ export class PhysWorld
 
     }
 
-    shouldApplyFriction(normal, directionalFriction, angleTolerance) 
+    shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB, log) 
     {
-        if(!directionalFriction) return false;
+        if (!directionalFriction) return false;
 
-        if(this.gravity.x !== 0 || this.gravity.y !== 0)
+        if (this.gravity.x !== 0 || this.gravity.y !== 0) 
         {
+            let dynamicBody;
+            let staticBody;
+
             const gravityNorm = normalize(this.gravity);
-            let normalNorm = normalize(normal);
 
-            const dot = dotProduct(normalNorm, gravityNorm);
+            if(!bodyA.isStatic && !bodyB.isStatic)
+            {   
+                let normalNorm = { ...normal };
+                
+                const alignment = dotProduct(normalNorm, gravityNorm);
+                //const isSideContact = alignment === 0;
+                const isSideContact = Math.abs(alignment) < angleTolerance;
+                return isSideContact;
+            }
+            else
+            {
 
-            if(dot > angleTolerance) return false;
+                if(bodyA.isStatic)
+                {
+                    staticBody = bodyA;
+                    dynamicBody = bodyB;
+                }
+                else
+                {
+                    staticBody = bodyB;
+                    dynamicBody = bodyA;
+                }
+            
+                let normalNorm = { ...normal };
 
-            return dot < angleTolerance; //0.75;
+                const toDynamic = subtractVectors(staticBody.position, dynamicBody.position);
+                
+                if (dotProduct(normalNorm, toDynamic) < 0) 
+                {
+                    normalNorm.x = -normalNorm.x;
+                    normalNorm.y = -normalNorm.y;
+                }
+
+                const dot = dotProduct(normalNorm, gravityNorm);
+
+                if (log)
+                {
+                    this.frictionNormalLogs(normalNorm,gravityNorm,dot,angleTolerance)
+                }
+
+                return dot < angleTolerance;
+
+            }
+           
         }
 
-        return false; // No gravity means no friction skip
+        return false;
+    }
+
+    frictionNormalLogs(normalNorm, gravityNorm, dot, angleTolerance)
+    {
+        console.log({
+            normal: normalNorm,
+            gravity: gravityNorm,
+            dot,
+            angleTolerance,
+            applies: !(dot < angleTolerance)
+        });
     }
 
 }

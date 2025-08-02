@@ -95,7 +95,7 @@ export function SAT(bodyA, bodyB)
         normal.x = -normal.x;
         normal.y = -normal.y;
     }
-    
+
     return {collision: true, normal: normal ,depth: depth};
 }
 
