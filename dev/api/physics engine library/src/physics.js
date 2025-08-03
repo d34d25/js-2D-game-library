@@ -44,6 +44,9 @@ export class PhysWorld
 
                     if(!AABBvsAABB(bodyA, bodyB)) continue;
 
+                     console.log("Resolving collision:", i, j, 
+                    "bodyA:", bodyA.isCircle, "bodyB:", bodyB.isCircle);
+
                     this.collisionStep(bodyA,bodyB, useRotations, useFriction, directionalFriction, angleTolerance);
                 }
             }
@@ -52,7 +55,8 @@ export class PhysWorld
     }
 
     collisionStep(bodyA, bodyB, useRotations, useFriction, directionalFriction, angleTolerance)
-    {   
+    {  
+
         let result = this.resolveCollisions(bodyA, bodyB);
 
         if(result.collision)
@@ -131,13 +135,17 @@ export class PhysWorld
         {
             result = circleVsCircle(bodyA, bodyB);
         }
+        else if (bodyA.isCircle && !bodyB.isCircle)
+        {
+            result = circleVsPolygon(bodyA,bodyB);
+             if (result.collision) {
+                result.normal.x = -result.normal.x;
+                result.normal.y = -result.normal.y;
+            }
+        }
         else if (!bodyA.isCircle && bodyB.isCircle)
         {
             result = circleVsPolygon(bodyB,bodyA);
-        }
-        else if (!bodyB.isCircle && bodyA.isCircle)
-        {
-            result = circleVsPolygon(bodyA,bodyB);
         }
         else
         {
@@ -145,7 +153,6 @@ export class PhysWorld
         }
 
         return result;
-
     }
 
     resolveCollisionsBasic(manifold)
@@ -666,6 +673,8 @@ export class PhysWorld
 
     shouldApplyFriction(normal, directionalFriction, angleTolerance, bodyA, bodyB) 
     {
+        if (bodyA.isCircle || bodyB.isCircle) return false;
+
         if (!directionalFriction) return false;
 
         if (this.gravity.x !== 0 || this.gravity.y !== 0) 
@@ -793,11 +802,50 @@ function logContactPoints(ctx, contacts)
         drawNormal(contacts.contact2, contacts.normal, 'black');
     }
 
-
-    
-
 }
 
 
 
 
+
+function drawCollisionNormalForCirclePolygon(ctx, bodyA, bodyB, collisionResult, scale = 30, color = 'magenta') 
+{
+    if (!collisionResult?.collision) return;
+
+    let circleBody = bodyA.isCircle ? bodyA : bodyB;
+    let polygonBody = bodyA.isCircle ? bodyB : bodyA;
+
+    const start = circleBody.position;
+    const normal = collisionResult.normal;
+
+    const end = {
+        x: start.x + normal.x * scale,
+        y: start.y + normal.y * scale
+    };
+
+    // Draw the normal line
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw arrowhead
+    const arrowSize = 5;
+    const angle = Math.atan2(normal.y, normal.x);
+
+    ctx.beginPath();
+    ctx.moveTo(end.x, end.y);
+    ctx.lineTo(
+        end.x - arrowSize * Math.cos(angle - Math.PI / 6),
+        end.y - arrowSize * Math.sin(angle - Math.PI / 6)
+    );
+    ctx.lineTo(
+        end.x - arrowSize * Math.cos(angle + Math.PI / 6),
+        end.y - arrowSize * Math.sin(angle + Math.PI / 6)
+    );
+    ctx.lineTo(end.x, end.y);
+    ctx.fillStyle = color;
+    ctx.fill();
+}

@@ -1,15 +1,14 @@
 import * as physics from "../../lib/physengine.js";
 import * as render from "../../lib/simpleRender.js";
-import * as input from "../../lib/simpleInput.js";
 
 export class Entity
 {
-    constructor({position = {x:0, y:0}, size = {w:10,h:10} ,imagePath = "", cropImage = false, frameW = 10, frameH = 10})
+    constructor({position = {x:0, y:0}, size = {w:10,h:10}, radius = 20 ,imagePath = "", cropImage = false, frameW = 10, frameH = 10})
     {
 
         this.position = position;
         this.size = size;
-        this.radius = this.size.w;
+        this.radius = radius;
 
         this.body = null;
 

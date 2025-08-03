@@ -4,18 +4,23 @@ export class Levels
 {
     static currentLevel = 0;
 
-    constructor({player = null, entities = [], bodies = [], gravity = {x:0, y:150}})
+    constructor({player, entities = [], bodies = [],gravity = {x:0, y:150}, tileSize = {w:50, h:50}})
     {
         this.player = player;
-        this.entities = entities;
-        this.bodies = bodies;
+        this.entities = [];
+        this.bodies = [];
         this.gravity = gravity;
 
+        this.tileSize = tileSize;
         Levels.currentLevel++;
+
+        this.tileMap = [];
 
         this.physWorld = new physics.PhysWorld([], this.gravity);
         this.addBodiesToPhysWorld();
     }
+
+
 
     addBodiesToPhysWorld() 
     {
@@ -45,3 +50,4 @@ export class Levels
 
 
 }
+

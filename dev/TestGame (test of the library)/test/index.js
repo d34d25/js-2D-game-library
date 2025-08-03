@@ -6,6 +6,7 @@ import { centerCameraOnEntity, Entity } from "../src/gameobjects/entity.js";
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
+
 let lastTime = 0;
 let accumulator = 0;
 let elapsed = 0;
@@ -50,12 +51,21 @@ function render(ctx)
     
     for(let currentBody = 0; currentBody < PHYSWORLD.bodies.length; currentBody++)
     {
-        render_.drawPolygon({ctx, vertices: PHYSWORLD.bodies[currentBody].transformedVertices, fillStyle:'crimson', alpha: 1})
+        if(!PHYSWORLD.bodies[currentBody].isCircle)
+        {
+            render_.drawPolygon({ctx, vertices: PHYSWORLD.bodies[currentBody].transformedVertices, fillStyle:'crimson', alpha: 1})
+        }
+        else
+        {
+            render_.drawCircle({ctx, point: PHYSWORLD.bodies[currentBody].position, color: 'green', radius: PHYSWORLD.bodies[currentBody].radius,
+                rotation: PHYSWORLD.bodies[currentBody].angle,
+                rotationIndicator: false})
+        }
+        
     }
     
     testEntity.drawRigidbodyFull(ctx, 'blue',1);
 
-    render_.drawCircle({ctx, point: testPlayer.entity.position, radius: 10, color: 'green', rotationIndicator: true});
     render_.setDarkOverlayUnified({ctx,x:-500, y:-500 ,width: canvas.width * 4, height: canvas.height * 4, lights: testEntity.lights, hasColor: true});
     render_.drawCircle({ctx, point: testPlayer.camera.position, radius: 10, color: 'green'});
 }

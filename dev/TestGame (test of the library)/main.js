@@ -7,6 +7,11 @@ let lastTime = 0;
 let accumulator = 0;
 let elapsed = 0;
 
+let fps = 0;
+let frames = 0;
+let fpsTimer = 0;
+
+
 let currentLevel = 1;
 let levels = [levelOne];
 
@@ -20,11 +25,25 @@ function gameLoop(timestamp)
     accumulator += frameTime;
     elapsed += dt;
 
+    frames++;
+    fpsTimer += dt;
+
+    if (fpsTimer >= 1) {
+    fps = frames;
+    frames = 0;
+    fpsTimer = 0;
+    }
+
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     levelOne.update(dt);
 
     levelOne.render(ctx);
+
+    ctx.fillStyle = "white";
+    ctx.font = "16px monospace";
+    ctx.fillText(`FPS: ${fps}`, 10, 20);
 
     requestAnimationFrame(gameLoop);
 }
