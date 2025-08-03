@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Level Editor</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+    #canvas-container, #form-container {
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    #canvas-container {
+      flex: 2;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #form-container {
+      flex: 1;
+      background: #ffffff;
+      border-left: 1px solid #ccc;
+    }
+    canvas {
+      border: 1px solid #000;
+      background: #fff;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="level-canvas" width="600" height="400"></canvas>
+  </div>
+  <div id="form-container">
+    <form id="level-form">
+        
+        <fieldset>
+        <legend>Object Properties</legend>
+        
+        Type: 
+            <select name="type">
+            <option value="box">Box</option>
+            <option value="triangle">Triangle</option>
+            <option value="circle">Circle</option>
+            </select>
+            <br />
+
+        Width: <input type="number" name="width" step="1" value="100" /><br />
+        Height: <input type="number" name="height" step="1" value="100" /><br />
+        Density: <input type="number" name="density" step="0.1" value="1" /><br />
+        Bounciness: <input type="number" name="bounciness" step="0.1" value="0" /><br />
+        Linear Damping X: <input type="number" name="linearDampingX" step="0.1" value="0" /><br />
+        Linear Damping Y: <input type="number" name="linearDampingY" step="0.1" value="0" /><br />
+        Angular Damping: <input type="number" name="angularDamping" step="0.1" value="0" /><br />
+        Static Friction: <input type="number" name="staticFriction" step="0.1" value="0.6" /><br />
+        Dynamic Friction: <input type="number" name="dynamicFriction" step="0.1" value="0.4" /><br />
+        Angle: <input type="number" name="angle" step="0.01" value="0" /><br />
+        Radius: <input type="number" name="radius" step="1" value="50" /><br />
+        Color: <input type="color" name="color" value="#ff0000" /><br />
+        Alpha: <input type="number" name="alpha" step="0.1" min="0" max="1" value="1" /><br />
+
+
+        <label><input type="checkbox" name="isStatic" checked/> Is Static</label><br />
+        <label><input type="checkbox" name="hasRotations" /> Has Rotations</label><br />
+        <label><input type="checkbox" name="hasGravity" /> Has Gravity</label><br /><br />
+        <label><input type="checkbox" name="isEntity" /> Is Entity</label><br /><br />
+        <label><input type="checkbox" name="hasBody" checked /> Has Body</label><br /><br />
+
+
+        <button type="button" id="add-object-btn">Add Object</button>
+        <button type="button" id="edit-toggle-btn">Edit Object</button>
+        <button type="button" id="update-object-btn">Update Object</button>
+        <button type="button" id="remove-object-btn">Remove Object</button>
+        <button type="button" id="export-json-btn">Export JSON</button>
+        <div id="export-output" style="white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
+
+        </fieldset>
+
+        <fieldset>
+        <legend>Lights</legend>
+        <div id="lights-container"></div>
+        <button type="button" id="add-light-btn">Add Light</button>
+        </fieldset>
+
+
+    </form>
+  </div>
+  <script src="editor.js"></script>
+</body>
+</html>
