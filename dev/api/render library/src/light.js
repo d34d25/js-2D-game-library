@@ -14,7 +14,7 @@ export class ConeLight {
     {
       this.position = position;
       this.angle = angle;
-      this.spread = Math.PI/spread;
+      this.spread = spread;
       this.length = length;
       this.intensity = intensity;
       this.color = color;
@@ -65,6 +65,7 @@ export function setDarkOverlayUnified({ ctx, width = 800, height = 600, color = 
 
       const x1 = shiftedX + Math.cos(angle - spread / 2) * length;
       const y1 = shiftedY + Math.sin(angle - spread / 2) * length;
+
       const x2 = shiftedX + Math.cos(angle + spread / 2) * length;
       const y2 = shiftedY + Math.sin(angle + spread / 2) * length;
 

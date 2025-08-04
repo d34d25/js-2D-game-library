@@ -1,3 +1,4 @@
+let objects = []; // to store added objects
 let camera = {
   x: 0,
   y: 0
@@ -22,7 +23,7 @@ document.getElementById("add-light-btn").addEventListener("click", () => {
     <strong>Light ${lightIndex + 1}</strong><br />
     Angle (radians): <input type="number" name="light-angle" step="0.01" value="0" /><br />
     Radius: <input type="number" name="light-radius" step="1" value="100" /><br />
-    Spread: <input type="number" name="light-spread" step="1" value="45" /><br />
+    Spread: <input type="number" name="light-spread" step="1" value="0.78" /><br />
     Length: <input type="number" name="light-length" step="1" value="100" /><br />
     Intensity: <input type="number" name="light-intensity" step="0.1" value="1" /><br />
     Color: <input type="color" name="light-color" value="#ffffff" /><br />
@@ -42,7 +43,7 @@ document.getElementById("add-light-btn").addEventListener("click", () => {
 
 
 //add object
-let objects = []; // to store added objects
+
 let selectedPosition = { x: 10, y: 10 }; // temporary, set from canvas later
 
 document.getElementById("add-object-btn").addEventListener("click", () => {
@@ -69,11 +70,12 @@ document.getElementById("add-object-btn").addEventListener("click", () => {
     angle: parseFloat(form.elements["angle"].value) || 0,
     radius: parseFloat(form.elements["radius"].value) || 0,
     hasGravity: form.elements["hasGravity"].checked,
-    color: form.elements["color"].value || "#000000",
+    color: hexToRgb(form.elements["color"].value || "#000000"),
     alpha: parseFloat(form.elements["alpha"].value) || 1,
     lights: [],
     isEntity: form.elements["isEntity"].checked,
-    hasBody: form.elements["hasBody"].checked
+    hasBody: form.elements["hasBody"].checked,
+    isPlayer: form.elements["isPlayer"].checked
     };
 
 
@@ -86,7 +88,7 @@ document.getElementById("add-object-btn").addEventListener("click", () => {
       spread: parseFloat(inputs[2].value) || 0,
       length: parseFloat(inputs[3].value) || 0,
       intensity: parseFloat(inputs[4].value) || 0,
-      color: inputs[5].value || "#ffffff",
+      color: hexToRgb(inputs[5].value || "#ffffff"),
       alpha: parseFloat(inputs[6].value) || 1,
       isCircular: inputs[7].checked,
       isCone: inputs[8].checked
@@ -102,7 +104,31 @@ document.getElementById("add-object-btn").addEventListener("click", () => {
 });
 
 
+function rgbToHex(color) {
+  const r = color.r.toString(16).padStart(2, '0');
+  const g = color.g.toString(16).padStart(2, '0');
+  const b = color.b.toString(16).padStart(2, '0');
+  return `#${r}${g}${b}`;
+}
 
+// Convert hex string (#rrggbb) to RGB object
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  return {
+    r: parseInt(hex.substring(0, 2), 16),
+    g: parseInt(hex.substring(2, 4), 16),
+    b: parseInt(hex.substring(4, 6), 16)
+  };
+}
+
+
+function rgbToRGBA(color, alpha) {
+  if (!color || color.r === undefined || color.g === undefined || color.b === undefined) {
+    console.warn("Invalid color object:", color);
+    return `rgba(0,0,0,${alpha})`; // fallback
+  }
+  return `rgba(${color.r},${color.g},${color.b},${alpha})`;
+}
 
 
 //drawing
@@ -127,8 +153,9 @@ function drawObjects() {
     ctx.save();
 
     ctx.globalAlpha = obj.alpha;
-    ctx.fillStyle = obj.color;
-    ctx.strokeStyle = obj.color;
+    ctx.fillStyle = `rgb(${obj.color.r},${obj.color.g},${obj.color.b})`;
+    ctx.strokeStyle = `rgb(${obj.color.r},${obj.color.g},${obj.color.b})`;
+
 
     ctx.translate(obj.position.x, obj.position.y);
     ctx.rotate(obj.angle);
@@ -160,7 +187,7 @@ function drawObjects() {
 
       if (light.isCircular) {
         const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, light.radius);
-        const rgba = hexToRGBA(light.color, light.alpha * light.intensity);
+        const rgba = rgbToRGBA(light.color, light.alpha * light.intensity);
         grad.addColorStop(0, rgba);
         grad.addColorStop(1, "rgba(0,0,0,0)");
 
@@ -170,13 +197,13 @@ function drawObjects() {
         ctx.fill();
       } else if (light.isCone) {
         const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, light.length);
-        const rgba = hexToRGBA(light.color, light.alpha * light.intensity);
+        const rgba = rgbToRGBA(light.color, light.alpha * light.intensity);
         grad.addColorStop(0, rgba);
         grad.addColorStop(1, "rgba(0,0,0,0)");
 
         ctx.fillStyle = grad;
 
-        const spreadRad = (light.spread * Math.PI) / 180;
+        const spreadRad = light.spread;
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.arc(0, 0, light.length, -spreadRad / 2, spreadRad / 2);
@@ -184,7 +211,7 @@ function drawObjects() {
         ctx.fill();
       } else {
         const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, light.radius);
-        const rgba = hexToRGBA(light.color, light.alpha * light.intensity);
+        const rgba = rgbToRGBA(light.color, light.alpha * light.intensity);
         grad.addColorStop(0, rgba);
         grad.addColorStop(1, "rgba(0,0,0,0)");
 
@@ -396,10 +423,13 @@ function loadObjectToForm(obj) {
   form.elements["dynamicFriction"].value = obj.dynamicFriction || 0;
   form.elements["isStatic"].checked = obj.isStatic || false;
   form.elements["hasRotations"].checked = obj.hasRotations || false;
+  form.elements["isEntity"].checked = obj.isEntity || false;
+  form.elements["hasBody"].checked = obj.hasBody || false;
+  form.elements["isPlayer"].checked = obj.isPlayer || false;
   form.elements["angle"].value = obj.angle || 0;
   form.elements["radius"].value = obj.radius || 0;
   form.elements["hasGravity"].checked = obj.hasGravity || false;
-  form.elements["color"].value = obj.color || "#000000";
+  form.elements["color"].value = rgbToHex(obj.color || {r:0,g:0,b:0});
   form.elements["alpha"].value = obj.alpha || 1;
 
   // Clear lights container then add lights from object
@@ -412,19 +442,25 @@ function loadObjectToForm(obj) {
     lightDiv.className = "light-block";
     lightDiv.innerHTML = `
         <hr />
-        <strong>Light ${lightIndex + 1}</strong><br />
+        <strong>Light ${index + 1}</strong><br />
         Angle (radians): <input type="number" name="light-angle" step="0.01" value="0" /><br />
         Radius: <input type="number" name="light-radius" step="1" value="100" /><br />
-        Spread: <input type="number" name="light-spread" step="1" value="45" /><br />
+        Spread: <input type="number" name="light-spread" step="1" value="0.78" /><br />
         Length: <input type="number" name="light-length" step="1" value="100" /><br />
         Intensity: <input type="number" name="light-intensity" step="0.1" value="1" /><br />
         Color: <input type="color" name="light-color" value="#ffffff" /><br />
         Alpha: <input type="number" name="light-alpha" step="0.1" min="0" max="1" value="1" /><br />
         <label><input type="checkbox" name="light-isCircular" checked /> Is Circular</label><br />
         <label><input type="checkbox" name="light-isCone" /> Is Cone</label><br />
+        <button type="button" class="remove-light-btn">Remove Light</button>
         `;
 
     lightsContainer.appendChild(lightDiv);
+
+    const removeBtn = lightDiv.querySelector(".remove-light-btn");
+    removeBtn.addEventListener("click", () => {
+    lightDiv.remove();
+  });
   });
 }
 
@@ -449,7 +485,7 @@ updateObjectBtn.addEventListener("click", () => {
   obj.angle = parseFloat(form.elements["angle"].value) || 0;
   obj.radius = parseFloat(form.elements["radius"].value) || 0;
   obj.hasGravity = form.elements["hasGravity"].checked;
-  obj.color = form.elements["color"].value || "#000000";
+  obj.color = hexToRgb(form.elements["color"].value || "#000000");
   obj.alpha = parseFloat(form.elements["alpha"].value) || 1;
 
   // Update lights from form inputs
@@ -463,7 +499,7 @@ updateObjectBtn.addEventListener("click", () => {
       spread: parseFloat(inputs[2].value) || 0,
       length: parseFloat(inputs[3].value) || 0,
       intensity: parseFloat(inputs[4].value) || 0,
-      color: inputs[5].value || "#ffffff",
+      color: hexToRgb(inputs[5].value || "#ffffff"),
       alpha: parseFloat(inputs[6].value) || 1,
       isCircular: inputs[7].checked,
       isCone: inputs[8].checked
@@ -525,4 +561,45 @@ document.getElementById("export-json-btn").addEventListener("click", () => {
 
   // Show JSON string inside the div
   exportDiv.textContent = jsonStr;
+});
+
+
+
+//importing 
+document.getElementById("import-json-btn").addEventListener("click", () => {
+  const input = document.getElementById("import-input").value;
+
+  try {
+    const imported = JSON.parse(input);
+
+    // Clear and replace the contents of the existing array
+    if (Array.isArray(imported)) {
+      objects.length = 0;
+      objects.push(...imported);
+    } else if (imported.objects && Array.isArray(imported.objects)) {
+      objects.length = 0;
+      objects.push(...imported.objects);
+    } else {
+      alert("Invalid format. Expected an array or an object with an 'objects' array.");
+      return;
+    }
+
+    // Reset UI
+    document.getElementById("level-form").reset();
+    document.getElementById("lights-container").innerHTML = "";
+    editMode = false;
+    editingObjectIndex = null;
+    draggingObject = null;
+    draggingCamera = false;
+
+    // Redraw canvas
+    drawObjects();
+
+    alert("Level imported successfully.");
+  } catch (err) {
+    alert("Invalid JSON:\n" + err.message);
+  }
+
+  console.log("Objects after import:", objects);
+
 });

@@ -73,6 +73,7 @@
         <label><input type="checkbox" name="hasGravity" /> Has Gravity</label><br /><br />
         <label><input type="checkbox" name="isEntity" /> Is Entity</label><br /><br />
         <label><input type="checkbox" name="hasBody" checked /> Has Body</label><br /><br />
+        <label><input type="checkbox" name="isPlayer" /> Is Player</label><br /><br />
 
 
         <button type="button" id="add-object-btn">Add Object</button>
@@ -81,6 +82,9 @@
         <button type="button" id="remove-object-btn">Remove Object</button>
         <button type="button" id="export-json-btn">Export JSON</button>
         <div id="export-output" style="white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto;"></div>
+
+        <textarea id="import-input" placeholder="Paste JSON here..." rows="10" style="width: 100%; margin-top: 10px;"></textarea>
+        <button id="import-json-btn" type="button">Import JSON</button>
 
         </fieldset>
 

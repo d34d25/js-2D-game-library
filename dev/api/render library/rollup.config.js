@@ -6,12 +6,7 @@ export default {
   input: "./exports.js",
   output: [
     {
-      file: "dist/my-lib.cjs.js",
-      format: "cjs", // CommonJS for Node.js
-      exports: "named"
-    },
-    {
-      file: "dist/my-lib.esm.js",
+      file: "dist/simpleRender.js",
       format: "esm", // ESModules
     },
     {
