@@ -1,4 +1,4 @@
-import levelOne from "./src/levels/levelOne.js";
+import testLevel from "./src/levels/testLevel.js";
 
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
@@ -11,9 +11,6 @@ let fps = 0;
 let frames = 0;
 let fpsTimer = 0;
 
-
-let currentLevel = 1;
-let levels = [levelOne];
 
 function gameLoop(timestamp)
 {
@@ -37,9 +34,9 @@ function gameLoop(timestamp)
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    levelOne.update(dt);
+    testLevel.update(dt);
 
-    levelOne.render(ctx);
+    testLevel.render(ctx);
 
     ctx.fillStyle = "white";
     ctx.font = "16px monospace";

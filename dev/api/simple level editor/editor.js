@@ -75,7 +75,8 @@ document.getElementById("add-object-btn").addEventListener("click", () => {
     lights: [],
     isEntity: form.elements["isEntity"].checked,
     hasBody: form.elements["hasBody"].checked,
-    isPlayer: form.elements["isPlayer"].checked
+    isPlayer: form.elements["isPlayer"].checked,
+    drawBody: form.elements["drawBody"].checked
     };
 
 
@@ -431,6 +432,7 @@ function loadObjectToForm(obj) {
   form.elements["hasGravity"].checked = obj.hasGravity || false;
   form.elements["color"].value = rgbToHex(obj.color || {r:0,g:0,b:0});
   form.elements["alpha"].value = obj.alpha || 1;
+  form.elements["drawBody"].value = obj.drawBody || false;
 
   // Clear lights container then add lights from object
   const lightsContainer = document.getElementById("lights-container");
@@ -487,6 +489,10 @@ updateObjectBtn.addEventListener("click", () => {
   obj.hasGravity = form.elements["hasGravity"].checked;
   obj.color = hexToRgb(form.elements["color"].value || "#000000");
   obj.alpha = parseFloat(form.elements["alpha"].value) || 1;
+  obj.drawBody = form.elements["drawBody"].checked;
+  obj.isPlayer = form.elements["isPlayer"].checked;
+  obj.isEntity = form.elements["isEntity"].checked;
+  obj.hasBody = form.elements["hasBody"].checked;
 
   // Update lights from form inputs
   obj.lights = [];
