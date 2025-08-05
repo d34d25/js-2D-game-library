@@ -230,5 +230,41 @@ export const testData = [
     "hasBody": true,
     "isPlayer": false,
     "drawBody": true
+  },
+  {
+    "type": "box",
+    "position": {
+      "x": 478.43853820598,
+      "y": 287.6119402985075
+    },
+    "size": {
+      "w": 100,
+      "h": 100
+    },
+    "density": 1,
+    "bounciness": 0,
+    "linearDamping": {
+      "x": 0,
+      "y": 0
+    },
+    "angularDamping": 0,
+    "staticFriction": 0.6,
+    "dynamicFriction": 0.4,
+    "isStatic": false,
+    "hasRotations": false,
+    "angle": 0,
+    "radius": 50,
+    "hasGravity": false,
+    "color": {
+      "r": 255,
+      "g": 0,
+      "b": 0
+    },
+    "alpha": 1,
+    "lights": [],
+    "isEntity": false,
+    "hasBody": true,
+    "isPlayer": false,
+    "drawBody": true
   }
 ]

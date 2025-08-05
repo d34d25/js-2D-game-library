@@ -18,16 +18,30 @@ let testLevel = new levels.Level(
 )
 
 
+/*idea: put these 3 functions below inside the level class, all the stuff that can be
+passed via arguments as conditions will be passed and for the rest I could pass
+a function as a parameter to "inject" the update and code that can't be
+predicted*/
+
+/*
+example 
+renderScene(ctx, drawHitboxes, overlay, overlayX, overlayY, overlayWidth, overlayHeight, coloredLigths, drawSprite(), otherDraw())
+*/
+
 testLevel.update = function(dt)
 {
     testLevel.player.move(dt);
     centerCameraOnEntity(testLevel.player.camera, testLevel.player.entity, canvas);
     testLevel.physWorld.step({dt, useRotations: true, iterations:20, directionalFriction: true, angleTolerance: 0.75});
+    //otherUpdate() ----> as parameter
 }
+
 
 testLevel.render = function(ctx)
 {
+    //if (useCamera)
     testLevel.player.camera.drawWithCamera({ctx, canvas, drawScene: () => renderScene({ctx, drawHitboxes: false, darkOverlay: true})});
+    //else renderScene();
 }
 
 function renderScene({ctx, drawHitboxes = false, darkOverlay = false, 
@@ -69,7 +83,7 @@ function renderScene({ctx, drawHitboxes = false, darkOverlay = false,
 
         if(!currentEntity.drawBody)
         {
-
+            //drawSprite() ----> as parameter
         }
         else
         {
@@ -95,6 +109,12 @@ function renderScene({ctx, drawHitboxes = false, darkOverlay = false,
             }
         }
     }
+    /*
+     else
+     {
+        otherDraw() ----> also as parameter
+     }
+     */
 
     if(darkOverlay)
     {
