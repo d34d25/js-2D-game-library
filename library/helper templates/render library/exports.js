@@ -1,5 +1,0 @@
-export * from "./src/basicDrawing.js"
-export * from "./src/camera.js"
-export * from "./src/debugDrawing.js"
-export * from "./src/imageDrawing.js"
-export * from "./src/light.js"
